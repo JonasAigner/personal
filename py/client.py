@@ -32,6 +32,8 @@ def execute(co):
         print("[*]Receiving File...")
         while (fil_data):
             newfil.write(fil_data)
+            if fil_data < bytes(1024):
+                break
             fil_data = client_socket.recv(1024)
         newfil.close()
         print("[*]File Received!")
@@ -104,3 +106,4 @@ while True:
         print("[*}Connection Lost!")
         sys.exit()
 
+#192.168.0.62
