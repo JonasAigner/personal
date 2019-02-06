@@ -1,208 +1,125 @@
 import socket
-import os
 import sys
-import random
 
-connected = False
-
-password = ""
-pwd1 = str(random.randint(0, 9))
-pwd2 = str(random.randint(0, 9))
-pwd3 = str(random.randint(0, 9))
-pwd4 = str(random.randint(0, 9))
-pwd5 = str(random.randint(0, 9))
-pwd6 = str(random.randint(0, 9))
-pwd7 = str(random.randint(0, 9))
-pwd8 = str(random.randint(0, 9))
-pwd9 = str(random.randint(0, 9))
-password = pwd1 + pwd2 + pwd3 + pwd4 + pwd5 + pwd6 + pwd7 + pwd8 + pwd9
-
-server_socket = socket.socket(socket.AF_INET,
+client_socket = socket.socket(socket.AF_INET,
                               socket.SOCK_STREAM)
-                              
-                            
-                              
-# socket.gethostname() geht nur wenn server und client nicht auf einem pc sind
-# ansonsten localhost ip adresse: 127.0.0.1
-host = socket.gethostname()
-ip = "127.0.0.1"
+                        
+
+serveradress = "127.0.0.1"
 port = 1337
-server_socket.bind((ip, port)) #'erstellt' server
 
+def end():
+   # client_socket.send(bytes("/quit", "utf8"))
+    #client_socket.close()
+    client_socket.send(bytes("Disconnecting...", "utf8"))
+    sys.exit()
 
-def sys_shell():
-    out = os.popen("date").read()
-    client_socket.send(str(out), "utf8")
-
-
-def send_file(filname):
-    fil = open(filname, "rb")
-    file_data = fil.read(1024)
-    print("[*]Sending File '{}'...".format(filname))
-    while (file_data):
-        client_socket.send(file_data)
-        file_data = fil.read(1024)
-    print("[*]File Sended Successful!")
-    print("[*]Closing client socket...")
-    client_socket.send(bytes("File sended", "utf8"))
-    client_socket.close()
-    connected = False
-    print("[*]client socked is closed")
-
-def syscom(co):
-    x = os.popen(co).read()
-    return x
+def helptext():
+    print("\n-------------- help --------------")
+    print(" '/'....................following text will be handled as a command")
+    print(" '@'....................calls an executer")
+    print(" 'ping'.................server pings back")
+    print("")
+    print("---- / ----")
+    print(" 'help'.................shows help")
+    print(" 'quit'.................close connection")
+    print(" 'transfer_file'........transfers a file from the server to the client")
+    print("")
+    print("---- @ ----")
+    print(" 'server'...............use server as executer")
+    print("")
+    print("---- @ / ----")
+    print(" 'dirname'..............shows path from executer")
+    print(" 'walk'.................displays all files and minor directorys in the executer's directory")
+    print(" 'walk_root'............displays all files in the executer's drive")
+    print("")
 
 def execute(co):
-    new = ""
-    colist = list(co)
-    colist[0] = ""
-    colist[1] = ""
-    for x in colist:
-        new += x
-    newsplit = new.split()
-    print("[CLIENT]:/" + new)
-    if new == "quit":
-        server_socket.close()
-    elif newsplit[0] == "send_file":
-        send_file(newsplit[1])
-    if new == "dirname":
-        #out = subprocess.run(("dir", "/W"), capture_output=True)
-        out = os.getcwd()
-        print("[*]Output: " + out)
-        client_socket.send(bytes(out, "utf8"))
-    elif new == "list":
-        out = os.listdir()
-        client_socket.send(bytes("---- direct of server ----", "utf8"))
-        client_socket.send(bytes("\n", "utf8"))
-        for entry in out:
-            client_socket.send(bytes(entry + "\n", "utf8"))
-        client_socket.send(bytes("---- end of server directory ----", "utf8"))
-    elif new == "platform":
-        out = sys.platform
-        if out == "win32":
-            x = sys.getwindowsversion()
-            out += " -version {}.{} -build {}".format(x.major, x.minor, x.build)
-        client_socket.send(bytes(out, "utf8"))
-    elif new == "walk":
-        counter = 0
-        way = "\n---------------- Walk ----------------\n"
-        for root, dirs, files in os.walk("."):
-            way += "Direcory: "+root+"\n"
-            way += "----- Minor Directorys -----\n"
-            for d in dirs:
-                way += d+"\n"
-            way += "--- Files ---\n"
-            for f in files:
-                way += f+"\n"
-            counter += 1
-        way += "\n\n" + str(counter) + " Directorys"
-        client_socket.send(bytes(way, "utf8"))
-        
-    elif new == "walk_root":
-        counter = 0
-        way = "\n---------------- Walk ----------------\n"
-        for root, dirs, files in os.walk("/"):
-            way += "Direcory: "+root+"\n"
-            way += "----- Minor Directorys -----\n"
-            for d in dirs:
-                way += d+"\n"
-            way += "--- Files ---\n"
-            for f in files:
-                way += f+"\n"
-            counter += 1
-        way += "\n\n" + str(counter) + " Directorys"
-        client_socket.send(bytes(way, "utf8"))
-    elif new == "os.system":
-        perm = False
-        client_socket.send(bytes("Password:", "utf8"))
-        pwd = client_socket.recv(1024)
-        if str(pwd, "utf8") == password:
-            print("[*]Permission for 'os.system' granted!")
-            client_socket.send(bytes("Permission granted! Type in command:", "utf8"))
-            perm = True
-        else:
-            client_socket.send(bytes("Wrong Password! Permission denied!", "utf8"))
-        if perm == True:
-            co = client_socket.recv(1024)
-            out = syscom(str(co, "utf8"))
-            print("[*]Executed '{}'".format(str(co, "utf8")))
-            client_socket.send(bytes("\n" + out, "utf8"))
+    if co == "/help":
+        helptext()
+    elif co == "/quit":
+        end()
+    elif co == "/transfer_file":
+        file_name = input("[*]Enter name of the file: ")
+        string = "//send_file " + file_name
+        client_socket.send(bytes(string, "utf8"))
+        newfil = open(file_name, "wb")
+        fil_data = client_socket.recv(1024)
+        #newfil.write(fil_data)
+        print("[*]Receiving File...")
+        while (fil_data):
+            newfil.write(fil_data)
+            if fil_data < bytes(1024):
+                break
+            fil_data = client_socket.recv(1024)
+        newfil.close()
+        print("[*]File Received!")
+    
     
     else:
-        try:
-            exec(new)
-            client_socket.send(bytes("Executed Command Successful", "utf8"))
-        except:
-            client_socket.send(bytes("[ERROR]:Command '{}' can not executed!".format(new), "utf8"))
-        
-        
-def send_back(msg):
-    new_msg = str(msg, "utf8")
-    if new_msg == "ping":
-        client_socket.send(bytes("ping", "utf8"))
-        print("[SERVER]: ping")
-    elif new_msg == "Disconnecting...":
-        pass
-    elif new_msg == "" or new_msg == " ":
-        client_socket.send(bytes(" ", "utf8"))
-        print("[SERVER]: ")
-    elif new_msg == "hi" or new_msg == "hallo" or new_msg == "hello" or new_msg == "Hi" or new_msg == "Hallo" or new_msg == "Hello":
-        client_socket.send(bytes("Hi", "utf8"))
-        print("[SERVER]: Hi")
-    elif new_msg == "help" or new_msg == "?" or new_msg == "Help" or new_msg == "HELP" or new_msg == "Hilfe" or new_msg == "hilfe":
-        client_socket.send(bytes("Type '/help' for help", "utf8"))
-        print("[SERVER]: Type '/help' for help")
+        print("Command '{}' not found!".format(co))
     
-    else:
-        client_socket.send(bytes(" ", "utf8"))
-        print("[SERVER]: ")
+    print("")
     
+def server_execute(co):
+    com = "/" + co
+    client_socket.send(bytes(com, "utf8"))
+    
+def sudo_execute(r):
+    rlist = r.split()
+    if rlist[0] == "@server":
+        server_execute(rlist[1])
+        
+
+
+try:
+    client_socket.connect((serveradress, port))  # I.P. Adresse von Server 127.0.0.1 ist localhost
+except ConnectionRefusedError:
+    print("[*]Connection Refused!")
+    sys.exit()
+
+
+send_msg = "ping"
 
 print("")
-print("----- Server Information -----")
-print("IP: " + ip)
-print("Port: " + str(port))
-print("Password: " + password)
+print("---- Server Information ----")
 print("")
-print("--------------- Listening ---------------")
-server_socket.listen(1) #schaut ob sich wer verbinden will 
-# listen(>1<) 1 bedeutet es darf sich nur einer gleichzeitig verbinden
+print("=======================")
+print("Server IP: {}".format(serveradress))
+print("Port: {}".format(port))
+print("=======================")
+print("")
+print("")
+print("------ Connection ------")
+print("[*]Connection Sucessfully!")
+client_socket.send(bytes(send_msg, "utf8"))
+print("[CLIENT]: {}".format(send_msg))
+msg_start = client_socket.recv(1024)
+print("[SERVER]: " + str(msg_start, "utf8"))
 
 while True:
-    if connected == False:
-        try:
-            (client_socket, addr) = server_socket.accept()
-            connected = True
-            print("------------ Connection ------------")
-            print("[*]Successfully connected with {} : {}".format(addr[0], addr[1]))
-            #client_socket.send(bytes("ping", "utf8"))
-        except OSError:
-            print("[*]Can't accept socket!")
-        except ConnectionResetError:
-            print("[*]Connection Lost!\n")
-    
     try:
+        r = input("[CLIENT]: ")
+        rlist = list(r)
+        try:
+            if rlist[0] == "/":
+                execute(r)
+                continue
+            elif rlist[0] == "@":
+                sudo_execute(r)
+            else:
+                client_socket.send(bytes(r, "utf8"))
+        except IndexError:
+            r = " "
+            client_socket.send(bytes(r, "utf8"))
+            
         msg = client_socket.recv(1024)
-        list_msg = list(str(msg, "utf8"))
-        if list_msg[0] == "/":
-            execute(str(msg, "utf8"))
-            #client_socket.send(bytes(" ", "utf8"))
-            continue
-        print("[CLIENT]: " + str(msg, "utf8")) # standart
-        
-        send_back(msg)
-        
-
-       
+        print("[SERVER]: " + str(msg, "utf8"))
+    
     except ConnectionResetError:
-        print("[*]Connection Lost!\n")
-        connected = False
-    except IndexError:
-        print("[*]Connection Lost!\n")
-        connected = False
-    except OSError:
-        print("[*]Connection Lost!\n")
-        connected = False
-           
+        print("[*]Connection Lost!")
+        sys.exit()
+    except ConnectionAbortedError:
+        print("[*}Connection Lost!")
+        sys.exit()
 
