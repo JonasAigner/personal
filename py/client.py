@@ -4,6 +4,7 @@ import sys
 client_socket = socket.socket(socket.AF_INET,
                               socket.SOCK_STREAM)
                         
+
 serveradress = "127.0.0.1"
 port = 1337
 
@@ -14,7 +15,24 @@ def end():
     sys.exit()
 
 def helptext():
-    print("[*]Help Coming Soon")
+    print("\n-------------- help --------------")
+    print(" '/'....................following text will be handled as a command")
+    print(" '@'....................calls an executer")
+    print(" 'ping'.................server pings back")
+    print("")
+    print("---- / ----")
+    print(" 'help'.................shows help")
+    print(" 'quit'.................close connection")
+    print(" 'transfer_file'........transfers a file from the server to the client")
+    print("")
+    print("---- @ ----")
+    print(" 'server'...............use server as executer")
+    print("")
+    print("---- @ / ----")
+    print(" 'dirname'..............shows path from executer")
+    print(" 'walk'.................displays all files and minor directorys in the executer's directory")
+    print(" 'walk_root'............displays all files in the executer's drive")
+    print("")
 
 def execute(co):
     if co == "/help":
