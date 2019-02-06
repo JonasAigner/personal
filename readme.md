@@ -9,7 +9,7 @@ https://jonasaigner.github.io/personal/
 
 ##Yagmail
 python sended gamil emails
-yagmail (pypi.org/project/yagmail)
+yagmail (https://pypi.org/project/yagmail/)
 
 ####preparation
 
