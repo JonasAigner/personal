@@ -6,3 +6,17 @@ https://jonasaigner.github.io/personal/
 * irc: Hex Chat (internet relay chat)
 * markdown: simple html variant (https://guides.github.com/features/mastering-markdown/)
 * python os: https://docs.python.org/3/library/os.html?highlight=os#module-os
+
+##Yagmail
+python sended gamil emails
+yagmail (pypi.org/project/yagmail)
+
+####preparation
+
+* enable on https://myaccount.google.com/security less secure access
+######Terminal:
+* pip install keyring
+* pip install yagmail
+######Python Promt:
+* yagmail.register("username", "password")
+* yagmail.SMTP("username").send("reciever", "subject", "body")
