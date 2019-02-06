@@ -1,8 +1,21 @@
 import socket
 import os
 import sys
+import random
 
 connected = False
+
+password = ""
+pwd1 = str(random.randint(0, 9))
+pwd2 = str(random.randint(0, 9))
+pwd3 = str(random.randint(0, 9))
+pwd4 = str(random.randint(0, 9))
+pwd5 = str(random.randint(0, 9))
+pwd6 = str(random.randint(0, 9))
+pwd7 = str(random.randint(0, 9))
+pwd8 = str(random.randint(0, 9))
+pwd9 = str(random.randint(0, 9))
+password = pwd1 + pwd2 + pwd3 + pwd4 + pwd5 + pwd6 + pwd7 + pwd8 + pwd9
 
 server_socket = socket.socket(socket.AF_INET,
                               socket.SOCK_STREAM)
@@ -35,6 +48,10 @@ def send_file(filname):
     client_socket.close()
     connected = False
     print("[*]client socked is closed")
+
+def syscom(co):
+    x = os.popen(co).read()
+    return x
 
 def execute(co):
     new = ""
@@ -69,7 +86,7 @@ def execute(co):
         client_socket.send(bytes(out, "utf8"))
     elif new == "walk":
         counter = 0
-        way = "\n---------------- Walk ----------------"
+        way = "\n---------------- Walk ----------------\n"
         for root, dirs, files in os.walk("."):
             way += "Direcory: "+root+"\n"
             way += "----- Minor Directorys -----\n"
@@ -84,7 +101,7 @@ def execute(co):
         
     elif new == "walk_root":
         counter = 0
-        way = "\n---------------- Walk ----------------"
+        way = "\n---------------- Walk ----------------\n"
         for root, dirs, files in os.walk("/"):
             way += "Direcory: "+root+"\n"
             way += "----- Minor Directorys -----\n"
@@ -96,22 +113,57 @@ def execute(co):
             counter += 1
         way += "\n\n" + str(counter) + " Directorys"
         client_socket.send(bytes(way, "utf8"))
+    elif new == "os.system":
+        perm = False
+        client_socket.send(bytes("Password:", "utf8"))
+        pwd = client_socket.recv(1024)
+        if str(pwd, "utf8") == password:
+            print("[*]Permission for 'os.system' granted!")
+            client_socket.send(bytes("Permission granted! Type in command:", "utf8"))
+            perm = True
+        else:
+            client_socket.send(bytes("Wrong Password! Permission denied!", "utf8"))
+        if perm == True:
+            co = client_socket.recv(1024)
+            out = syscom(str(co, "utf8"))
+            print("[*]Executed '{}'".format(str(co, "utf8")))
+            client_socket.send(bytes("\n" + out, "utf8"))
     
     else:
         try:
             exec(new)
+            client_socket.send(bytes("Executed Command Successful", "utf8"))
         except:
-            client_socket.send(bytes("", "utf8"))
+            client_socket.send(bytes("[ERROR]:Command '{}' can not executed!".format(new), "utf8"))
         
         
-
+def send_back(msg):
+    new_msg = str(msg, "utf8")
+    if new_msg == "ping":
+        client_socket.send(bytes("ping", "utf8"))
+        print("[SERVER]: ping")
+    elif new_msg == "Disconnecting...":
+        pass
+    elif new_msg == "" or new_msg == " ":
+        client_socket.send(bytes(" ", "utf8"))
+        print("[SERVER]: ")
+    elif new_msg == "hi" or new_msg == "hallo" or new_msg == "hello" or new_msg == "Hi" or new_msg == "Hallo" or new_msg == "Hello":
+        client_socket.send(bytes("Hi", "utf8"))
+        print("[SERVER]: Hi")
+    elif new_msg == "help" or new_msg == "?" or new_msg == "Help" or new_msg == "HELP" or new_msg == "Hilfe" or new_msg == "hilfe":
+        client_socket.send(bytes("Type '/help' for help", "utf8"))
+        print("[SERVER]: Type '/help' for help")
+    
+    else:
+        client_socket.send(bytes(" ", "utf8"))
+        print("[SERVER]: ")
     
 
 print("")
 print("----- Server Information -----")
 print("IP: " + ip)
 print("Port: " + str(port))
-print("")
+print("Password: " + password)
 print("")
 print("--------------- Listening ---------------")
 server_socket.listen(1) #schaut ob sich wer verbinden will 
@@ -139,14 +191,8 @@ while True:
             continue
         print("[CLIENT]: " + str(msg, "utf8")) # standart
         
-        if str(msg, "utf8") == "ping":
-            client_socket.send(bytes("ping", "utf8"))
-            print("[SERVER]: ping")
-        elif str(msg, "utf8") == "Disconnecting...":
-            pass
-        elif str(msg, "utf8") != "":
-            client_socket.send(bytes("hi", "utf8"))
-            print("[SERVER]: hi")
+        send_back(msg)
+        
 
        
     except ConnectionResetError:
