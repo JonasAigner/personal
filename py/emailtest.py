@@ -1,6 +1,7 @@
 import yagmail
 import csv
 
+#you need a csv file with in 1. the names and 2. the emails
 username = "your username"
 password = "your password"
 
