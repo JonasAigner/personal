@@ -20,3 +20,7 @@ yagmail (https://pypi.org/project/yagmail/)
 ######Python Promt:
 * yagmail.register("username", "password")
 * yagmail.SMTP("username").send("reciever", "subject", "body")
+
+
+##Working with Django
+made django tutorial
