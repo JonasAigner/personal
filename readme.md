@@ -23,4 +23,5 @@ yagmail (https://pypi.org/project/yagmail/)
 
 
 ##Working with Django
-made django tutorial
+made django tutorial:
+https://docs.djangoproject.com/en/2.1/intro/reusable-apps/
