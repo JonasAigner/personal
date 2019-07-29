@@ -31,4 +31,4 @@ https://docs.djangoproject.com/en/2.1/intro/reusable-apps/
 https://www.pyinstaller.org/
 
 ##Working with Kivy
-kivy( https://kivy.org )
+( https://kivy.org )
