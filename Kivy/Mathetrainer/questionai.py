@@ -94,18 +94,16 @@ def solver(question):
         elif i.__class__.__name__ == "int":
             s += str(i)
     try:
-        result = eval(s)
-        return result
+        result = int(eval(s))
     except:
-        #print("Bad Result")
+        print("Bad Result")
         return None
-    #results = []
-    #results.append(result)
-    #for x in range(3):
-    #   a = random.randint(1,50)*random.choice((-1,1))+result
-    #   results.append(a)
-    #print(results) 
-    #return results
+    results = []
+    results.append(result)
+    for x in range(3):
+       a = random.randint(1,50)*random.choice((-1,1))+result
+       results.append(a) 
+    return results
             
 if __name__ == "__main__":
     print(solver(generate_question()))
