@@ -9,7 +9,6 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 import gc
 import random
-import questiongen
 import questionai
 import time
             
@@ -168,7 +167,7 @@ class Game():
         self.points = 0
         Game.points = self.points
         self.fails = 0
-        self.difficulty = "extreme"
+        self.difficulty = None
         self.get_task()
         
     def restart_game(self):
@@ -184,29 +183,17 @@ class Game():
 
     def get_task(self):
         if self.difficulty == None:
-            while True:
-                if self.points <= 3:
-                    self.task_list = questiongen.generate_question(1)
-                elif self.points <= 6:
-                    self.task_list = questiongen.generate_question(2)
-                elif self.points <= 9:
-                    self.task_list = questiongen.generate_question(3)
-                elif self.points > 9:
-                    self.task_list = questiongen.generate_question(4)
-                if self.task_list == None:   
-                    continue
-                else:
-                    break
+            if self.points <= 3:
+                self.task_list = questionai.generate_question(3)
+            elif self.points <= 6:
+                self.task_list = questionai.generate_question(7)
+            elif self.points <= 9:
+                self.task_list = questionai.generate_question(10)
+            elif self.points > 9:
+                self.task_list = questionai.generate_question(30)   
         elif self.difficulty.__class__.__name__ == "int":
-            while True:
-                self.task_list = questiongen.generate_question(self.difficulty)
-                if self.task_list == None:
-                    continue
-                else:
-                    break
-        elif self.difficulty == "extreme":
-            self.task_list = questionai.generate_question()
-        self.results = questiongen.solver(self.task_list)
+            self.task_list = questionai.generate_question(self.difficulty)
+        self.results = questionai.solver(self.task_list)
         task = ""
         for x in self.task_list:
             task += str(x)
