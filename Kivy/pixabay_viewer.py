@@ -1,3 +1,43 @@
+"""
+# about
+
+this app let you  download up to 20 pictures from Pixabay of any given search word(s)
+
+## Prepare
+You need to replace in Class MyGui, method go(self) the
+ INSERT_YOUR_PIXABAY_KEY_HERE with with your own Pixabay key.
+You can get your pixabay key for free by making an account at Pixabay.com
+and then lokking up the key at the site https://pixabay.com/api/docs/.
+
+
+## How to install:
+
+install Kivy (for python3), following the instructions at Kivy.org
+
+## How to use:
+
+start the app, enter the search word(s) in the white field (upper right),
+then press Enter. Wait a bit (see output at python console). After the
+download of the 20 pictures is finished you can see the pictures using
+the "next" and "previous" buttons. 
+All pictures are downloaded into the same folder as this python program.
+You will also find a json.txt file there with more information about the
+images
+
+## legal
+
+Pictures at pixabay are free to use, but it is recommended to link to
+Pixabay (see pixabay.org). Attribution to the individual uploaders of 
+the images can be found on the pixabay site of each image (see the json file).
+
+Pixabay does not allow hotlinking the pictures directly from an app, it
+is required to first download the pictures and then use them.
+
+## author
+Horst JENS, horstjens@gmail.com http://spielend-programmieren.at
+"""
+
+
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
